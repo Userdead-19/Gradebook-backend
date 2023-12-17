@@ -10,6 +10,7 @@ import com.example.Gradebook.model.Student;
 import java.util.List;
 
 @RestController
+@RequestMapping("/api")
 public class Postcontroller {
 
     // Autowire the StudentRepository
