@@ -1,6 +1,8 @@
 package com.example.Gradebook;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.Gradebook.model.Courseinfo;
@@ -8,20 +10,20 @@ import com.example.Gradebook.model.Gradeentry;
 import com.example.Gradebook.model.Student;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
 public class Postcontroller {
 
-    // Autowire the StudentRepository
     @Autowired
-    StudentRepository sr;
+    private StudentRepository sr; // Replace with the actual implementation
 
     @Autowired
-    CourseinfoRepository cr;
+    private CourseinfoRepository cr; // Replace with the actual implementation
 
     @Autowired
-    GradeentryRepository gr;
+    private GradeentryRepository gr; // Replace with the actual implementation
 
     @RequestMapping("/post")
     public String post() {
@@ -33,8 +35,6 @@ public class Postcontroller {
         return sr.findAll();
     }
 
-    // Add @RequestBody annotation to indicate that the Student object is in the
-    // request body
     @PostMapping("/student")
     public Student saveStudent(@RequestBody Student student) {
         return sr.save(student);
@@ -45,21 +45,9 @@ public class Postcontroller {
         return cr.findAll();
     }
 
-    // Add @RequestBody annotation to indicate that the Courseinfo object is in the
-    // request body
     @PostMapping("/courseinfo")
     public Courseinfo saveCourseinfo(@RequestBody Courseinfo courseinfo) {
         return cr.save(courseinfo);
-    }
-
-    @GetMapping("/student/{id}")
-    public Student getStudentById(@PathVariable String rollno) {
-        return (Student) sr.findAll(rollno);
-    }
-
-    @GetMapping("/courseinfo/{courseid}")
-    public Courseinfo getCourseinfoById(@PathVariable String courseid) {
-        return cr.findAll(courseid);
     }
 
     @GetMapping("/gradeentry")
@@ -67,31 +55,41 @@ public class Postcontroller {
         return gr.findAll();
     }
 
-    // Add @RequestBody annotation to indicate that the Gradeentry object is in the
-    // request body
     @PostMapping("/gradeentry")
     public Gradeentry saveGradeentry(@RequestBody Gradeentry gradeentry) {
         return gr.save(gradeentry);
     }
 
-    @GetMapping("/gradeentry/{rollno}")
-    public Gradeentry getGradeentryById(@PathVariable String rollno) {
-        return gr.findAll(rollno);
-    }
-
     @PutMapping("/student/{rollno}")
-    public Gradeentry updateGradeentry(@PathVariable String rollno, @RequestBody Gradeentry gradeentry) {
-        Gradeentry gradeentry1 = gr.findAll(rollno);
-        gradeentry1.setRollno(gradeentry.getRollno());
-        gradeentry1.setCourseid(gradeentry.getCourseid());
-        gradeentry1.setFinalmarks(gradeentry.getFinalmarks());
-        return gr.save(gradeentry1);
+    public ResponseEntity<Gradeentry> updateGradeentry(@PathVariable String rollno,
+            @RequestBody Gradeentry gradeentry) {
+        Optional<Gradeentry> optionalGradeentry = gr.findById(rollno);
+
+        if (optionalGradeentry.isPresent()) {
+            Gradeentry existingGradeentry = optionalGradeentry.get();
+            existingGradeentry.setRollno(gradeentry.getRollno());
+            existingGradeentry.setCourseid(gradeentry.getCourseid());
+            existingGradeentry.setFinalmarks(gradeentry.getFinalmarks());
+            return ResponseEntity.ok(gr.save(existingGradeentry));
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @DeleteMapping("/student/{rollno}")
-    public String deleteGradeentry(@PathVariable String rollno) {
-        gr.deleteById(rollno);
-        return "Deleted gradeentry with id: " + rollno;
+    public ResponseEntity<String> deleteGradeentry(@PathVariable String rollno) {
+        try {
+            gr.deleteById(rollno);
+            return ResponseEntity.ok("Deleted gradeentry with id: " + rollno);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal Server Error");
+        }
     }
 
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<String> handleException(Exception e) {
+        e.printStackTrace();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal Server Error");
+    }
 }

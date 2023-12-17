@@ -6,6 +6,4 @@ import com.example.Gradebook.model.Courseinfo;
 
 public interface CourseinfoRepository extends MongoRepository<Courseinfo, String> {
 
-    Courseinfo findAll(String courseid);
-
 }
