@@ -10,6 +10,7 @@ public class Student {
     private String lastName;
     private String dob;
     private String email;
+    private String[] coursesEnrolled = { "19z301", "19z302", "19z303", "19z304", "19z305" };
 
     public String getRollno() {
         return Rollno;
@@ -57,7 +58,10 @@ public class Student {
     @Override
     public String toString() {
         return "Student [Rollno=" + Rollno + ", firstName=" + firstName + ", lastName=" + lastName + ", dob=" + dob
-                + ", email=" + email + "]";
+                + ", email=" + email + "]" + "\n" + "Courses Enrolled: " + coursesEnrolled;
     }
 
+    public String[] getCourseEnrolled() {
+        return coursesEnrolled;
+    }
 }

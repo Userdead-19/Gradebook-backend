@@ -9,6 +9,11 @@ public class Gradeentry {
     private float Assignment1;
     private float Assignment2;
     private float finalmarks;
+    private float Totalmarks = 0;
+
+    public float getTotalmarks() {
+        return Totalmarks;
+    }
 
     private String comments;
 
@@ -34,6 +39,7 @@ public class Gradeentry {
 
     public void setAssignment1(float assignment1) {
         Assignment1 = assignment1;
+        Totalmarks += Assignment1 / 2;
     }
 
     public float getAssignment2() {
@@ -42,6 +48,7 @@ public class Gradeentry {
 
     public void setAssignment2(float assignment2) {
         Assignment2 = assignment2;
+        Totalmarks += Assignment2 / 2;
     }
 
     public float getFinalmarks() {
@@ -50,6 +57,7 @@ public class Gradeentry {
 
     public void setFinalmarks(float finalmarks) {
         this.finalmarks = finalmarks;
+        Totalmarks += finalmarks / 2;
     }
 
     public String getComments() {

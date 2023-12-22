@@ -9,6 +9,8 @@ import com.example.Gradebook.model.Courseinfo;
 import com.example.Gradebook.model.Gradeentry;
 import com.example.Gradebook.model.Student;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,13 +19,13 @@ import java.util.Optional;
 public class Postcontroller {
 
     @Autowired
-    private StudentRepository sr; // Replace with the actual implementation
+    private StudentRepository sr;
 
     @Autowired
-    private CourseinfoRepository cr; // Replace with the actual implementation
+    private CourseinfoRepository cr;
 
     @Autowired
-    private GradeentryRepository gr; // Replace with the actual implementation
+    private GradeentryRepository gr;
 
     @RequestMapping("/post")
     public String post() {
@@ -40,6 +42,16 @@ public class Postcontroller {
         return sr.save(student);
     }
 
+    @PutMapping("/student")
+    public Student updateStudent(@RequestBody Student student) {
+        return sr.save(student);
+    }
+
+    @GetMapping("/student/{rollno}")
+    public Optional<Student> getStudent(@PathVariable String rollno) {
+        return sr.findById(rollno);
+    }
+
     @GetMapping("/courseinfo")
     public List<Courseinfo> getCourseinfo() {
         return cr.findAll();
@@ -50,6 +62,16 @@ public class Postcontroller {
         return cr.save(courseinfo);
     }
 
+    @PutMapping("/courseinfo")
+    public Courseinfo updateCourseinfo(@RequestBody Courseinfo courseinfo) {
+        return cr.save(courseinfo);
+    }
+
+    @GetMapping("/courseinfo/{courseid}")
+    public Optional<Courseinfo> getCourseinfo(@PathVariable String courseid) {
+        return cr.findById(courseid);
+    }
+
     @GetMapping("/gradeentry")
     public List<Gradeentry> getGradeentry() {
         return gr.findAll();
@@ -57,6 +79,11 @@ public class Postcontroller {
 
     @PostMapping("/gradeentry")
     public Gradeentry saveGradeentry(@RequestBody Gradeentry gradeentry) {
+        return gr.save(gradeentry);
+    }
+
+    @PutMapping("/gradeentry")
+    public Gradeentry updateGradeentry(@RequestBody Gradeentry gradeentry) {
         return gr.save(gradeentry);
     }
 
@@ -85,6 +112,23 @@ public class Postcontroller {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal Server Error");
         }
+    }
+
+    @GetMapping("/gradeentry/for/{rollno}")
+    public HashMap<List<Gradeentry>, Float> getGradeentryForEach(@PathVariable String rollno) {
+        List<Gradeentry> gradeentries = gr.findAll();
+        List<Gradeentry> gradeentries2 = new ArrayList<>();
+        float Overall = 0;
+        for (Gradeentry gradeentry : gradeentries) {
+            if (gradeentry.getRollno().equals(rollno)) {
+                gradeentries2.add(gradeentry);
+                Overall += gradeentry.getTotalmarks();
+
+            }
+        }
+        HashMap<List<Gradeentry>, Float> hm = new HashMap<List<Gradeentry>, Float>();
+        hm.put(gradeentries2, Overall);
+        return hm;
     }
 
     @ExceptionHandler(Exception.class)
